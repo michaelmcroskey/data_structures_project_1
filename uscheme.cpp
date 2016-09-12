@@ -16,8 +16,13 @@ bool DEBUG = false;
 // Structures ------------------------------------------------------------------
 
 struct Node {
-    Node(string value, Node *left=nullptr, Node *right=nullptr);
-    ~Node();
+    Node(string value, Node *left=nullptr, Node *right=nullptr) {
+	value = value; left = left; right = right;
+    };
+    ~Node() {
+	if (left) delete left;
+	if (right) delete right;
+    };
 
     string value;
     Node * left;
@@ -27,17 +32,45 @@ struct Node {
 };
 
 ostream &operator<<(ostream &os, const Node &n) {
+    os << "(Node: value=" << n.value;
+    if (n.left != NULL) os << ", left=" << n.left;
+    if (n.right != NULL) os << ", right=" << n.right;
+    os << ")" << endl;
     return os;
 }
+ 
 
 // Parser ----------------------------------------------------------------------
 
 string parse_token(istream &s) {
-    string token;
+    string token = ""; 
+    char c = s.peek();
+    while (c == ' ') c = s.get(); //should skip whitespaces
+    //c = s.get();
+    if (c == '(' || c == ')' || c == '+' || c == '-' || c == '*' || c == '/') 
+	token += c;
+    else if ((c > '0' && c < '9') || c == '.') {
+	while ((c > '0' && c < '9') || c == '.') {
+	    token =+ c;
+	    c = s.get();
+	}
+    }
     return token;
 }
 
 Node *parse_expression(istream &s) {
+    string token = parse_token(s);
+    Node *left = NULL;
+    Node *right = NULL;
+    if (token == "" || token == ")") return NULL;
+    else if (token == "(") {
+	token = parse_token(s);
+	left = parse_expression(s);
+	right = parse_expression(s);
+	//if (right) parse_token(s)
+	//no if left if right used... 
+    }
+    //else left = NULL; right = NULL;
     return new Node(token, left, right);
 }
 
