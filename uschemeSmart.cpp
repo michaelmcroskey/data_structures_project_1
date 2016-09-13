@@ -18,19 +18,15 @@ bool DEBUG = false;
 // Structures ------------------------------------------------------------------
 
 struct Node {
-    Node(string Nvalue, Node *Nleft=nullptr, Node *Nright=nullptr) {
+    Node(string Nvalue, shared_ptr<Node> Nleft, shared_ptr<Node> Nright) {
         value = Nvalue;
         left = Nleft;
         right = Nright;
     };
-    ~Node() {
-        if (left) delete left;
-        if (right) delete right;
-    };
     
     string value;
-    Node * left;
-    Node * right;
+    shared_ptr<Node> left;
+    shared_ptr<Node> right;
     
     friend ostream &operator<<(ostream &os, const Node &n);
 };
@@ -70,10 +66,10 @@ string parse_token(istream &s) {
     return token;
 }
 
-Node *parse_expression(istream &s) {
+shared_ptr<Node> parse_expression(istream &s) {
     string token = parse_token(s);
-    Node *left = NULL;
-    Node *right = NULL;
+    shared_ptr<Node> left = NULL;
+    shared_ptr<Node> right = NULL;
     
     if (token == "" || token == ")") return NULL;
     else if (token == "(") {
@@ -84,12 +80,13 @@ Node *parse_expression(istream &s) {
         //no if left if right used...
     }
     //else left = NULL; right = NULL;
-    return new Node(token, left, right);
+	return shared_ptr<Node> (new Node{token, left, right});
+    //return new Node(token, left, right);
 }
 
 // Interpreter -----------------------------------------------------------------
 
-void evaluate_r(const Node *n, stack<int> &s) {
+void evaluate_r(const shared_ptr <Node> n, stack<int> &s) {
     char tmp = n->value[0];
     if((tmp>='0' && tmp<='9') || tmp=='.')
         s.push(stoi(n->value));
@@ -108,8 +105,9 @@ void evaluate_r(const Node *n, stack<int> &s) {
     }
 }
 
-int evaluate(const Node *n) {
-    stack<int> s;
+int evaluate(shared_ptr<Node> &n) {
+    //stack<int> s;
+	stack<int> s;
     evaluate_r(n, s);
     return s.top();
 }
@@ -146,12 +144,11 @@ int main(int argc, char *argv[]) {
         if (DEBUG) { cout << "LINE: " << line << endl; }
         
         stringstream s(line);
-        Node *n = parse_expression(s);
+        shared_ptr<Node> n = parse_expression(s);
         if (DEBUG) { cout << "TREE: " << *n << endl; }
         
         cout << evaluate(n) << endl;
         
-        delete n;
     }
     
     return EXIT_SUCCESS;
