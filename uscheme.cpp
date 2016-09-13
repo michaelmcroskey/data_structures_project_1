@@ -5,6 +5,7 @@
 #include <stack>
 #include <string>
 #include <unistd.h>
+#include <memory>
 
 using namespace std;
 
