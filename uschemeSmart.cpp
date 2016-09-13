@@ -1,10 +1,12 @@
-// uscheme.cpp
+// uschemeSmart.cpp
 
 #include <iostream>
 #include <sstream>
 #include <stack>
 #include <string>
 #include <unistd.h>
+
+#define UNIQUE_NODE(x, y, z) shared_ptr<Node<char>> (new Node<char>{x, y, z})
 
 using namespace std;
 
