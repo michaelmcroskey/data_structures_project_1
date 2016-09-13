@@ -16,8 +16,8 @@ bool DEBUG = false;
 // Structures ------------------------------------------------------------------
 
 struct Node {
-    Node(string value, Node *left=nullptr, Node *right=nullptr) {
-	value = value; left = left; right = right;
+    Node(string Nvalue, Node *Nleft=nullptr, Node *Nright=nullptr) {
+	value = Nvalue; left = Nleft; right = Nright;
     };
     ~Node() {
 	if (left) delete left;
@@ -33,9 +33,12 @@ struct Node {
 
 ostream &operator<<(ostream &os, const Node &n) {
     os << "(Node: value=" << n.value;
-    if (n.left != NULL) os << ", left=" << n.left;
-    if (n.right != NULL) os << ", right=" << n.right;
-    os << ")" << endl;
+    if (n.left != NULL) { 
+	os << ", left=" << *n.left;
+	//if (n.right != NULL) assuming right will be defined if left is defined
+	os << ", right=" << *n.right;
+    }
+    cout << ")";
     return os;
 }
  
@@ -44,14 +47,19 @@ ostream &operator<<(ostream &os, const Node &n) {
 
 string parse_token(istream &s) {
     string token = ""; 
-    char c = s.peek();
+    char c = s.get();
     while (c == ' ') c = s.get(); //should skip whitespaces
-    //c = s.get();
-    if (c == '(' || c == ')' || c == '+' || c == '-' || c == '*' || c == '/') 
-	token += c;
-    else if ((c > '0' && c < '9') || c == '.') {
-	while ((c > '0' && c < '9') || c == '.') {
-	    token =+ c;
+    
+    //operand or parentheses
+    if (c == '(' || c == ')' || c == '+' || c == '-' || c == '*' || c == '/')  
+	token += c; 
+
+    //digit
+    else if ((c >= '0' && c <= '9') || c == '.') {
+	while (1) { //(c > '0' && c < '9') || c == '.') {  //use while loop to read entire digit
+	    token += c;
+	    c = s.peek();
+	    if (!((c >= '0' && c <= '9') || c == '.')) break;
 	    c = s.get();
 	}
     }
@@ -66,8 +74,8 @@ Node *parse_expression(istream &s) {
     else if (token == "(") {
 	token = parse_token(s);
 	left = parse_expression(s);
-	right = parse_expression(s);
-	//if (right) parse_token(s)
+	if(left) right = parse_expression(s);
+	if (right) parse_token(s);
 	//no if left if right used... 
     }
     //else left = NULL; right = NULL;
@@ -77,10 +85,28 @@ Node *parse_expression(istream &s) {
 // Interpreter -----------------------------------------------------------------
 
 void evaluate_r(const Node *n, stack<int> &s) {
+    char tmp = n->value[0];
+    if((tmp>='0' && tmp<='9') || tmp=='.')
+	s.push(stoi(n->value));
+    else {
+	evaluate_r(n->right, s);
+	evaluate_r(n->left, s);
+	
+	int a = s.top();
+	s.pop();
+	int b = s.top();
+	s.pop();
+	if(tmp == '+') s.push(a+b); 
+	else if (tmp == '-') s.push(a-b);
+	else if (tmp == '*') s.push(a*b);
+	else if (tmp == '/') s.push(a/b);
+    }
 }
 
 int evaluate(const Node *n) {
-    return 0;
+    stack<int> s;
+    evaluate_r(n, s);
+    return s.top();
 }
 
 // Main execution --------------------------------------------------------------
@@ -121,7 +147,7 @@ int main(int argc, char *argv[]) {
 
         delete n;
     }
-
+    
     return 0;
 }
 
