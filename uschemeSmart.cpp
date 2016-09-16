@@ -4,6 +4,7 @@
 #include <sstream>
 #include <stack>
 #include <string>
+#include <memory>
 #include <unistd.h>
 
 #define UNIQUE_NODE(x, y, z) shared_ptr<Node<char>> (new Node<char>{x, y, z})
