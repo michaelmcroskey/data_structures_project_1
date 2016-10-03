@@ -51,10 +51,10 @@ I would implement it almost the same way but I would use a tree that would have 
 Group Contributions
 -------------------
 
-**Troy: Did most of uscheme and helped on the README.**
+**Troy Prince (tprince): Did most of uscheme and helped on the README.**
 
-**David: Helped on uscheme, did the smart pointers and the README.**
+**David Mellitt (dmellitt): Helped on uscheme, did the smart pointers and the README.**
 
-**Michael: Helped on uscheme, did the smart pointers and the README**
+**Michael McRoskey (mmcrosk1): Helped on uscheme, did the smart pointers and the README**
 
 
